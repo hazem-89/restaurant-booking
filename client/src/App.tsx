@@ -1,22 +1,16 @@
-import React from 'react';
-
+import { Route, Routes } from 'react-router-dom';
+import ConfirmationPage from './pages/Confirmation/ConfirmationPage';
+import HomePage from './pages/HomePage/HomePage';
+import Reservation from './pages/Reservation/Reservation';
+import './App.css';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes >
+      <Route path="/" element={<HomePage />} />
+      <Route path="/reservation" element={<Reservation />} />
+      <Route path="/confirmation" element={<ConfirmationPage />} />
+      {/* <Route path="*" element={< />} /> */}
+    </Routes>
   );
 }
 
