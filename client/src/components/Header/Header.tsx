@@ -1,4 +1,5 @@
 import { Box, SxProps, Typography } from '@mui/material'
+import { Link } from 'react-router-dom';
 
 
 //logo
@@ -14,12 +15,19 @@ const Header = () => {
         </Typography>
       </Box>
       <Box sx={navText}>
-        <Typography>
-          Home
-        </Typography>
-        <Typography>
-          Reservation
-        </Typography>
+        <Link to='/' style={{ textDecoration: "none", color: "#f1f1f1" }}
+        >
+          <Typography>
+            Home
+          </Typography>
+        </Link>
+        <Link to='/reservation' style={{ textDecoration: "none", color: "#f1f1f1" }}
+        >
+          <Typography>
+            Reservation
+          </Typography>
+        </Link>
+
         <Typography>
           About
         </Typography>

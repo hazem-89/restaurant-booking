@@ -1,4 +1,5 @@
 import { Box, Button, SxProps, Typography } from '@mui/material'
+import { Link } from 'react-router-dom';
 import MainBackGroundImg from '../../assets/img/123.jpg'
 
 const MainPageHero = () => {
@@ -15,9 +16,11 @@ const MainPageHero = () => {
           Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quos vitae tempora iusto similique aperiam officia non molestias mollitia recusandae. Ullam.
         </Typography>
       </Box>
-      <Button sx={reservationBtn}>
-        Reservation
-      </Button>
+      <Link to='/reservation'>
+        <Button sx={reservationBtn}>
+          Reservation
+        </Button>
+      </Link>
     </Box>
   )
 }
