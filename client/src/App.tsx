@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import ConfirmationPage from './pages/Confirmation/ConfirmationPage';
 import HomePage from './pages/HomePage/HomePage';
 import Reservation from './pages/Reservation/Reservation';
+import ContactPage from './pages/ContactPage/Contact';
 import './App.css';
 function App() {
   return (
@@ -9,6 +10,8 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/reservation" element={<Reservation />} />
       <Route path="/confirmation" element={<ConfirmationPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+
       {/* <Route path="*" element={< />} /> */}
     </Routes>
   );

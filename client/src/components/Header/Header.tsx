@@ -21,16 +21,19 @@ const Header = () => {
             Home
           </Typography>
         </Link>
-        <Link to='/reservation' style={{ textDecoration: "none", color: "#f1f1f1" }}
-        >
+
+        <Link to='/reservation' style={{ textDecoration: "none", color: "#f1f1f1" }}>
           <Typography>
             Reservation
           </Typography>
         </Link>
 
-        <Typography>
-          About
-        </Typography>
+        <Link to='/contact' style={{ textDecoration: "none", color: "#f1f1f1" }}>
+          <Typography>
+            Contact Us
+          </Typography>
+        </Link>
+
       </Box>
     </Box>
   )
