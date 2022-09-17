@@ -5,14 +5,16 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import connectDB from './config/Db';
 import bookingRouter from './routes/Bookings/Booking.routes'
+import availabilityRouter from './routes/Availability/Availability.routes'
 
 
 
 const app = express();
 const port = 4000;
 const routes = Router();
-app.use(routes);
 
+
+app.use(routes);
 app.use(express.json());
 app.use(
   session({
@@ -22,6 +24,7 @@ app.use(
   })
 );
 routes.use('/api', bookingRouter)
+routes.use('/api', availabilityRouter)
 
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(cookieParser());

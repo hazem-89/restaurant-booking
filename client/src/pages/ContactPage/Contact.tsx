@@ -1,9 +1,15 @@
 import React from 'react'
+import Footer from '../../components/Footer/Footer'
+import Header from '../../components/Header/Header'
 
-const Contact = () => {
+const contactPage = () => {
   return (
-    <div>Contact</div>
+    <div>
+      <Header />
+      <h1 style={{ color: 'white' }} >Contact Us</h1>
+      <Footer />
+    </div>
   )
 }
 
-export default Contact
+export default contactPage 

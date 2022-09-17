@@ -5,3 +5,8 @@ export interface BookingInterface {
   date: Date;
   title: string;
 }
+export interface tableInterface {
+  name: string;
+  isAvailable: boolean;
+}
+
