@@ -1,12 +1,10 @@
-export interface BookingInterface {
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  date: Date;
-  title: string;
-}
-export interface tableInterface {
-  name: string;
-  isAvailable: boolean;
-}
+import mongoose from "mongoose";
 
+export interface BookingInterface {
+  NOG: Number;
+  customerId: mongoose.Schema.Types.ObjectId;
+  phone: string;
+  date: Date;
+  time: Date;
+  tableId: String;
+}
