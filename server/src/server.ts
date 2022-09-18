@@ -7,12 +7,14 @@ import connectDB from './config/Db';
 import bookingRouter from './routes/Bookings/Booking.routes'
 import availabilityRouter from './routes/Availability/Availability.routes'
 
+var bodyParser = require('body-parser');
 
 
 const app = express();
 const port = 4000;
 const routes = Router();
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(routes);
 app.use(express.json());
