@@ -1,0 +1,12 @@
+POST  http://localhost:4000/api/newBooking
+Content-Type: application/json
+
+{
+    "NOG": "6",
+    "phone": "7666666",
+    "tableId": "632634f8adb44440450d39ef"
+}
+
+###
+
+GET  http://localhost:4000/api/bookings

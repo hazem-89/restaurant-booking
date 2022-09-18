@@ -1,41 +1,37 @@
 import express, { Request, Response, Router } from 'express';
 import BookingModels from '../../models/BookingModels'
-import Day from '../../models/day'
-import tableModels from '../../models/table'
+import { BookingInterface } from '../../interface'
+import { Document, Types } from 'mongoose';
+import AdminModels from '../../models/AdminModels'
+
 const bookingRouter = Router();
 
 
+bookingRouter.get('/bookings', async (req: Request, res: Response) => {
+  const allBookings = BookingModels.find((err: any, bookings: any) => {
+    console.log(bookings);
+    if (err) {
+      res.send("Error!");
+    } else {
+      res.send(bookings);
+    }
+  })
+  // console.log(typeof allBookings, allBookings);
+
+  // res.status(200).send(allBookings)
+})
 
 //  new booking
-bookingRouter.post('/bookings', async (req: Request, res: Response) => {
-  Day.find({ date: req.body.date }, (err: any, days: string | any[]) => {
-    if (!err) {
-      if (days.length > 0) {
-        let day = days[0];
-        day.tables.forEach(table => {
-          if (table._id == req.body.table) {
-            // The correct table is table
-            table.reservation = new BookingModels({
-              name: req.body.name,
-              phone: req.body.phone,
-              email: req.body.email
-            });
-            table.isAvailable = false;
-            day.save((err: any) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log("Reserved");
-                res.status(200).send("Added Reservation");
-              }
-            });
-          }
-        });
-      } else {
-        console.log("Day not found");
-      }
-    }
-  });
+bookingRouter.post('/newBooking', async (req: Request, res: Response) => {
+
+  const newBooking = new BookingModels(req.body);
+  try {
+    const savedBooking = await newBooking.save();
+    res.status(200).send(savedBooking)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+
 })
 
 
