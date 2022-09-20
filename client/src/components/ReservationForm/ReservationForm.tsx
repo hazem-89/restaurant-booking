@@ -4,41 +4,111 @@ import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { Dayjs } from 'dayjs';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import DatePicker from "react-datepicker";
 import { Button, SxProps } from '@mui/material';
+import axios, { AxiosResponse } from "axios";
+import { ReservationsInterface, BookingInterface } from "../../Interfaces"
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const ReservationForm = () => {
-  const [numberOfPersons, setNumberOfPersons] = useState('');
-  const [date, setDate] = React.useState<Dayjs | null>(null);
+  const [numberOfPersons, setNumberOfPersons] = useState(0);
+  const [chosenDate, setChosenDate] = useState(new Date());
+  const [chosenTime, setChosenTime] = useState('');
   const [bookingFormOpen, setBookingFormOpen] = useState(false);
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
   const [email, setEmail] = useState('');
+  const [allAvailableTables, setAllAvailableTables] = useState([]);
+  const [tableId, setTableId] = useState('');
+  const [error, setError] = useState('');
   console.log(name, phoneNum, email);
-  console.log(date);
 
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setNumberOfPersons(event.target.value as string);
+  const getAvailableTables = () => {
+    const date = chosenDate.toLocaleDateString();
+    try {
+      axios
+        .post(`http://localhost:4000/api/availability`, {
+          date: date
+        })
+        .then((response) => {
+          const data = response.data.availableTables
+          console.log(data);
+          console.log();
+          console.log(typeof data);
+          setAllAvailableTables(data);
+
+        })
+    } catch (error) {
+      console.log("Failure", error);
+    }
+
+
+    console.log("date", date);
+  }
+  const createBooking = () => {
+    // registered customer
+    const newBooking: ReservationsInterface = {
+      NOG: numberOfPersons,
+      name: name,
+      phone: phoneNum,
+      date: chosenDate.toLocaleDateString(),
+      time: chosenTime,
+      tableId: tableId
+    };
+    axios
+      .post<BookingInterface>("http://localhost:4000/api/newBooking", newBooking)
+      .then((response) => {
+        console.log(response);
+
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
+  const handelDate = (newDate: Date) => {
+    const curDate = new Date(new Date().toString().substring(0, 15))
+    if (newDate > curDate) {
+      setChosenDate(newDate)
+      console.log("bigger");
+      setError('')
+
+    } else {
+
+      const errText = "The date has passed, please give a new date"
+      setError(errText)
+      console.log("lower");
+      console.log(curDate);
+      console.log(newDate);
+    }
+  }
+  const handleTime = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = e.target.value;
+    setChosenTime(time);
+  };
+  const handleChange = ((e: { target: { value: any; }; }, child: any) => {
+    const value = e.target.value;
+    const gussetsNumber = parseInt(value)
+    setNumberOfPersons(gussetsNumber);
+  });
   return (
     <Box sx={mainBox}>
       {!bookingFormOpen ?
         <Box sx={innerBox}>
           <Box sx={selectBox}>
-            <Box sx={{ height: '200px', width: '150px' }}>
+            <Box sx={{ height: '300px', width: '150px' }}>
+              <h5>Number of gusts</h5>
               <FormControl fullWidth sx={{ backgroundColor: '#1397B4', }}>
                 <InputLabel id="demo-simple-select-label">Persons</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={numberOfPersons}
-                  label="Age"
+                  label="Amount"
                   onChange={handleChange}
                 >
                   <MenuItem value={1}>1 person</MenuItem>
@@ -50,24 +120,23 @@ const ReservationForm = () => {
                 </Select>
               </FormControl>
             </Box>
-            <Box sx={{ height: '200px', marginLeft: '1em' }} >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Choose a date "
-                  value={date}
-                  onChange={(newValue) => {
-                    setDate(newValue);
-                  }}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-              </LocalizationProvider>
+
+            <Box sx={{ height: '300px', marginLeft: '1em' }} >
+              <Box>
+                <h5>Please chose a date</h5>
+              </Box>
+              <DatePicker selected={chosenDate} onChange={handelDate} />
             </Box>
           </Box>
           <Box>
-            {date && numberOfPersons ? <Box>
+            {chosenDate && numberOfPersons && error === '' ? <Box>
               <Button
                 variant="contained"
-                onClick={() => setBookingFormOpen(true)}
+                onClick={() => {
+                  getAvailableTables()
+                  // setBookingFormOpen(true)
+                }
+                }
                 sx={button}
               >
                 Confirm
@@ -77,7 +146,63 @@ const ReservationForm = () => {
           </Box>
         </Box>
         : null}
-
+      {error ? <Box>
+        <p>{error}</p>
+      </Box> : null}
+      {allAvailableTables.length !== 0 ?
+        <Box sx={{ backgroundColor: "black", width: "1000px", height: "1500px", color: "white" }}>
+          <h1 style={{ color: 'white' }}>allAvailableTables</h1>
+          {allAvailableTables.map((table: any) => (
+            <Box key={table.tableId}>
+              <p style={{ color: 'white' }}>{table.tableName}</p>
+              {table.isAvailableAt18 ?
+                <Box
+                  onClick={() => setTableId(table.tableId)}
+                >
+                  <input
+                    type="radio"
+                    id="18:00"
+                    name="time"
+                    value="18:00"
+                    checked={chosenTime === "18:00"}
+                    onChange={handleTime}
+                  ></input>
+                  <label>18:00</label>
+                </Box> : <p>no 18</p>
+              }
+              {table.isAvailableAt21 ?
+                <Box
+                  onClick={() => setTableId(table.tableId)}
+                >
+                  <input
+                    type="radio"
+                    id="21:00"
+                    name="time"
+                    value="21:00"
+                    checked={chosenTime === "21:00"}
+                    onChange={handleTime}
+                  ></input>
+                  <label>21:00</label>
+                </Box>
+                : <p>no 21</p>}
+            </Box>
+          ))}
+          <Box>
+            <Button
+              type="submit"
+              value="Send"
+              variant="contained"
+              onClick={() => {
+                setBookingFormOpen(true)
+              }}
+              sx={button}
+            >
+              Confirm
+            </Button>
+          </Box>
+        </Box>
+        : null
+      }
 
       {bookingFormOpen ?
         // Form Box
@@ -92,7 +217,7 @@ const ReservationForm = () => {
               label="Name"
               type="text"
               required
-              onChange={(newValue) => setName(newValue.target.value)}
+              onChange={(newValue: { target: { value: React.SetStateAction<string>; }; }) => setName(newValue.target.value)}
               sx={textArea}
             />
             <TextField
@@ -101,7 +226,7 @@ const ReservationForm = () => {
               label="Phone"
               type="phone"
               required
-              onChange={(newValue) => setPhoneNum(newValue.target.value)}
+              onChange={(newValue: { target: { value: React.SetStateAction<string>; }; }) => setPhoneNum(newValue.target.value)}
               sx={textArea}
             />
             <TextField
@@ -110,16 +235,21 @@ const ReservationForm = () => {
               label="Email"
               type="email"
               required
-              onChange={(newValue) => setEmail(newValue.target.value)}
+              onChange={(newValue: { target: { value: React.SetStateAction<string>; }; }) => setEmail(newValue.target.value)}
               sx={textArea}
             />
             <Box>
+              <Box>
+
+                <br></br>
+
+              </Box>
               <Button
                 type="submit"
                 value="Send"
                 variant="contained"
                 onClick={() => {
-                  window.location.href = "/confirmation"
+                  createBooking()
                 }}
                 sx={button}
               >
@@ -130,6 +260,7 @@ const ReservationForm = () => {
                 value="Send"
                 variant="contained"
                 onClick={() => {
+
                   setBookingFormOpen(false)
                 }}
                 sx={cancelButton}
@@ -166,7 +297,9 @@ const innerBox: SxProps = {
 const selectBox: SxProps = {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  maxHeight: '200px'
+
 }
 const formBox: SxProps = {
   position: 'absolute',
