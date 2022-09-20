@@ -8,9 +8,8 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    customerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: false,
+    name: {
+      type: String,
     },
     phone: {
       type: String,
@@ -18,11 +17,11 @@ const bookingSchema = new mongoose.Schema(
     },
     date: {
       type: Date,
-      default: new Date(2022, 9, 9)
+      default: new Date()
     },
     time: {
-      type: Date,
-      default: new Date(2022, 9, 9, 18)
+      type: String,
+      required: true,
     },
     tableId: {
       type: String,
