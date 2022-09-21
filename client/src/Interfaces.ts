@@ -7,9 +7,10 @@ export interface BookingInterface {
 }
 export interface ReservationsInterface {
   tableId?: string;
-  date: string;
-  time: string;
-  NOG: number;
+  date?: string;
+  time?: string;
+  NOG?: number;
   phone: string;
   name: string;
+  email: string;
 }
