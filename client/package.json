@@ -21,6 +21,7 @@
     "aos": "^2.3.4",
     "axios": "^0.27.2",
     "dayjs": "^1.11.5",
+    "formik": "^2.2.9",
     "react": "^18.2.0",
     "react-aos": "^1.0.1",
     "react-datepicker": "^4.8.0",
@@ -30,7 +31,8 @@
     "react-select": "^5.4.0",
     "sassy-datepicker": "^0.10.1",
     "typescript": "^4.8.3",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yup": "^0.32.11"
   },
   "scripts": {
     "start": "react-scripts start",

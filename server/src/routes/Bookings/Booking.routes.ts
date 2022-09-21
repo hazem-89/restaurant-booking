@@ -30,6 +30,8 @@ bookingRouter.post('/newBooking', async (req: Request, res: Response) => {
     res.status(200).send(savedBooking)
   } catch (err) {
     res.status(500).json(err)
+    console.log('err');
+
   }
 
 })

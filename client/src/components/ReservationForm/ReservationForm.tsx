@@ -7,26 +7,90 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import DatePicker from "react-datepicker";
-import { Button, SxProps } from '@mui/material';
+import { Button, SxProps, Typography } from '@mui/material';
 import axios, { AxiosResponse } from "axios";
 import { ReservationsInterface, BookingInterface } from "../../Interfaces"
 import "react-datepicker/dist/react-datepicker.css";
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 
 
-const ReservationForm = () => {
+
+export interface ReservationsDetails {
+  name: string;
+  phone: string;
+  email: string;
+}
+// form validate
+type BookingSchemaType = Record<keyof ReservationsDetails, Yup.AnySchema>;
+const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+const BookingSchema = Yup.object().shape<BookingSchemaType>({
+  name: Yup.string().required('Please enter your name.').min(4),
+  phone: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Please enter your phone.').test('len', 'phone number must be 10 characters', val => val?.length === 10),
+  email: Yup.string().email().required('Please enter your email.'),
+});
+
+const emptyForm: ReservationsDetails = {
+  name: '',
+  phone: '',
+  email: '',
+};
+interface Props {
+  defaultReservationsDetails?: ReservationsDetails;
+}
+
+const ReservationForm = (_props: Props) => {
   const [numberOfPersons, setNumberOfPersons] = useState(0);
   const [chosenDate, setChosenDate] = useState(new Date());
   const [chosenTime, setChosenTime] = useState('');
-  const [bookingFormOpen, setBookingFormOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [phoneNum, setPhoneNum] = useState('');
-  const [email, setEmail] = useState('');
   const [allAvailableTables, setAllAvailableTables] = useState([]);
   const [tableId, setTableId] = useState('');
   const [error, setError] = useState('');
-  console.log(name, phoneNum, email);
+  const [bookingFormOpen, setBookingFormOpen] = useState(false);
+  const [availabilityOpen, setAvailabilityOpen] = useState(false);
+  const [submitError, setSubmitError] = useState<string | undefined>(undefined);
+  let nav = useNavigate();
 
 
+  //  formik form 
+  const { values, errors, touched, handleChange, handleSubmit, handleBlur } =
+    useFormik<ReservationsDetails>({
+      initialValues: emptyForm,
+      validationSchema: BookingSchema,
+      onSubmit: (ReservationsDetails, { resetForm }) => {
+        setSubmitError(undefined);
+
+
+        /** Register a new reservation */
+        const createBooking = async () => {
+          const newBooking: ReservationsInterface = {
+            NOG: numberOfPersons,
+            name: ReservationsDetails.name,
+            phone: ReservationsDetails.phone,
+            email: ReservationsDetails.email,
+            date: chosenDate.toLocaleDateString(),
+            time: chosenTime,
+            tableId: tableId,
+          };
+          await axios
+            .post<BookingInterface>("http://localhost:4000/api/newBooking", newBooking)
+            .then((response) => {
+              console.log(response);
+              nav("/confirmation")
+              resetForm();
+
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
+        };
+        createBooking();
+      },
+    });
+
+  /** Get all available tables */
   const getAvailableTables = () => {
     const date = chosenDate.toLocaleDateString();
     try {
@@ -39,102 +103,95 @@ const ReservationForm = () => {
           console.log(data);
           console.log();
           console.log(typeof data);
-          setAllAvailableTables(data);
+          if (response.data.availableTables.length <= 0) {
+            const errText = "unfortunately we are fully booked, please chose a different Date"
+            setError(errText)
+          } else {
+            setAllAvailableTables(data);
+          }
 
         })
     } catch (error) {
       console.log("Failure", error);
     }
-
-
     console.log("date", date);
   }
-  const createBooking = () => {
-    // registered customer
-    const newBooking: ReservationsInterface = {
-      NOG: numberOfPersons,
-      name: name,
-      phone: phoneNum,
-      date: chosenDate.toLocaleDateString(),
-      time: chosenTime,
-      tableId: tableId
-    };
-    axios
-      .post<BookingInterface>("http://localhost:4000/api/newBooking", newBooking)
-      .then((response) => {
-        console.log(response);
 
 
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  /** Compare dates and st chosen date*/
   const handelDate = (newDate: Date) => {
     const curDate = new Date(new Date().toString().substring(0, 15))
     if (newDate > curDate) {
       setChosenDate(newDate)
-      console.log("bigger");
       setError('')
-
     } else {
-
       const errText = "The date has passed, please give a new date"
       setError(errText)
-      console.log("lower");
       console.log(curDate);
       console.log(newDate);
     }
   }
+
+  /** Set chosen time */
   const handleTime = (e: React.ChangeEvent<HTMLInputElement>) => {
     const time = e.target.value;
     setChosenTime(time);
   };
-  const handleChange = ((e: { target: { value: any; }; }, child: any) => {
+
+  /** Set number of the gusts */
+  const handleNOGChange = ((e: { target: { value: any; }; }, child: any) => {
     const value = e.target.value;
     const gussetsNumber = parseInt(value)
     setNumberOfPersons(gussetsNumber);
   });
+
   return (
     <Box sx={mainBox}>
+      {/* date bicker and number of gusts Box */}
       {!bookingFormOpen ?
         <Box sx={innerBox}>
           <Box sx={selectBox}>
             <Box sx={{ height: '300px', width: '150px' }}>
               <h5>Number of gusts</h5>
-              <FormControl fullWidth sx={{ backgroundColor: '#1397B4', }}>
-                <InputLabel id="demo-simple-select-label">Persons</InputLabel>
+              <FormControl fullWidth sx={{ backgroundColor: '#1397B4', height: '100px' }}>
+                <InputLabel id="demo-simple-select-label">Gusts</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={numberOfPersons}
                   label="Amount"
-                  onChange={handleChange}
+                  onChange={handleNOGChange}
+                  sx={{ height: '50px' }}
                 >
-                  <MenuItem value={1}>1 person</MenuItem>
-                  <MenuItem value={2}>2 persons</MenuItem>
-                  <MenuItem value={3}>3 persons</MenuItem>
-                  <MenuItem value={4}>4 persons</MenuItem>
-                  <MenuItem value={5}>5 persons</MenuItem>
-                  <MenuItem value={6}>6 persons</MenuItem>
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={6}>6</MenuItem>
                 </Select>
               </FormControl>
             </Box>
 
+            {/* DatePicker */}
             <Box sx={{ height: '300px', marginLeft: '1em' }} >
               <Box>
                 <h5>Please chose a date</h5>
               </Box>
-              <DatePicker selected={chosenDate} onChange={handelDate} />
+              <DatePicker
+                selected={chosenDate}
+                onChange={handelDate}
+              />
             </Box>
           </Box>
           <Box>
+            {/* check Available Tables button */}
             {chosenDate && numberOfPersons && error === '' ? <Box>
               <Button
                 variant="contained"
                 onClick={() => {
                   getAvailableTables()
-                  // setBookingFormOpen(true)
+                  setAvailabilityOpen(true)
                 }
                 }
                 sx={button}
@@ -144,60 +201,77 @@ const ReservationForm = () => {
             </Box> : null
             }
           </Box>
+
         </Box>
         : null}
-      {error ? <Box>
-        <p>{error}</p>
-      </Box> : null}
-      {allAvailableTables.length !== 0 ?
-        <Box sx={{ backgroundColor: "black", width: "1000px", height: "1500px", color: "white" }}>
-          <h1 style={{ color: 'white' }}>allAvailableTables</h1>
-          {allAvailableTables.map((table: any) => (
-            <Box key={table.tableId}>
-              <p style={{ color: 'white' }}>{table.tableName}</p>
-              {table.isAvailableAt18 ?
-                <Box
-                  onClick={() => setTableId(table.tableId)}
-                >
-                  <input
-                    type="radio"
-                    id="18:00"
-                    name="time"
-                    value="18:00"
-                    checked={chosenTime === "18:00"}
-                    onChange={handleTime}
-                  ></input>
-                  <label>18:00</label>
-                </Box> : <p>no 18</p>
-              }
-              {table.isAvailableAt21 ?
-                <Box
-                  onClick={() => setTableId(table.tableId)}
-                >
-                  <input
-                    type="radio"
-                    id="21:00"
-                    name="time"
-                    value="21:00"
-                    checked={chosenTime === "21:00"}
-                    onChange={handleTime}
-                  ></input>
-                  <label>21:00</label>
-                </Box>
-                : <p>no 21</p>}
-            </Box>
-          ))}
+
+      {allAvailableTables.length !== 0 && availabilityOpen ?
+        <Box sx={maineTablesBox}>
+          <Box  >
+            <h1 style={{ color: 'white' }}>allAvailableTables</h1>
+          </Box>
+          <Box sx={AllTables}>
+            {allAvailableTables.map((table: any) => (
+              <Box sx={tableBox} key={table.tableId}>
+                <p style={{ color: 'white' }}>{table.tableName.charAt(0).toUpperCase() + table.tableName.slice(1)}</p>
+                {table.isAvailableAt18 ?
+                  <Box
+                    onClick={() => setTableId(table.tableId)}
+                  >
+                    <input
+                      type="radio"
+                      id="18:00"
+                      name="time"
+                      value="18:00"
+                      checked={chosenTime === "18:00"}
+                      onChange={handleTime}
+                    ></input>
+                    <label>18:00</label>
+                  </Box> : <p>no 18</p>
+                }
+                {table.isAvailableAt21 ?
+                  <Box
+                    onClick={() => setTableId(table.tableId)}
+                  >
+                    <input
+                      type="radio"
+                      id="21:00"
+                      name="time"
+                      value="21:00"
+                      checked={chosenTime === "21:00"}
+                      onChange={handleTime}
+                    ></input>
+                    <label>21:00</label>
+                  </Box>
+                  : <p>no 21</p>}
+              </Box>
+            ))}
+          </Box>
           <Box>
             <Button
+              disabled={!chosenTime}
               type="submit"
               value="Send"
               variant="contained"
               onClick={() => {
                 setBookingFormOpen(true)
+                setAvailabilityOpen(false)
+
               }}
               sx={button}
             >
               Confirm
+            </Button>
+            <Button
+              type="submit"
+              value="Send"
+              variant="contained"
+              onClick={() => {
+                setAvailabilityOpen(false)
+              }}
+              sx={cancelButton}
+            >
+              Cancel
             </Button>
           </Box>
         </Box>
@@ -207,73 +281,96 @@ const ReservationForm = () => {
       {bookingFormOpen ?
         // Form Box
         <Box>
-          <Box sx={formBox}>
-            <p className='title'>
-              Your contact information
-            </p>
-            <TextField
-              id="name-input"
-              name="from_name"
-              label="Name"
-              type="text"
-              required
-              onChange={(newValue: { target: { value: React.SetStateAction<string>; }; }) => setName(newValue.target.value)}
-              sx={textArea}
-            />
-            <TextField
-              id="name-input"
-              name="phone"
-              label="Phone"
-              type="phone"
-              required
-              onChange={(newValue: { target: { value: React.SetStateAction<string>; }; }) => setPhoneNum(newValue.target.value)}
-              sx={textArea}
-            />
-            <TextField
-              id="name-input"
-              name="email"
-              label="Email"
-              type="email"
-              required
-              onChange={(newValue: { target: { value: React.SetStateAction<string>; }; }) => setEmail(newValue.target.value)}
-              sx={textArea}
-            />
-            <Box>
+          <form onSubmit={handleSubmit}>
+            {/* Display error if invalid input */}
+            {!!submitError && (
+              <Typography sx={{ color: 'red' }}>{submitError}</Typography>
+            )}
+            <Box sx={formBox}>
+              <p className='title'>
+                Your contact information
+              </p>
+              <TextField
+                id="name"
+                name="name"
+                label="Name"
+                type="text"
+                required
+                value={values.name}
+                onChange={handleChange}
+                error={touched.name && !!errors.name}
+                helperText={touched.name && errors.name}
+                sx={textArea}
+                onBlur={handleBlur}
+              />
+              <TextField
+                id="Phone"
+                name="phone"
+                label="Phone"
+                type="text"
+                value={values.phone}
+                required
+                onChange={handleChange}
+                error={touched.phone && !!errors.phone}
+                helperText={touched.phone && errors.phone}
+                sx={textArea}
+                onBlur={handleBlur}
+              />
+              <TextField
+                id="email"
+                name="email"
+                label="Email"
+                type="text"
+                value={values.email}
+                required
+                onChange={handleChange}
+                error={touched.email && !!errors.email}
+                helperText={touched.email && errors.email}
+                sx={textArea}
+                onBlur={handleBlur}
+              />
               <Box>
-
-                <br></br>
-
+                <Button
+                  type="submit"
+                  value="Send"
+                  variant="contained"
+                  // onClick={() => {
+                  //   setAvailabilityOpen(false)
+                  //   setBookingFormOpen(false)
+                  //   window.location.href = "/confirmation"
+                  // }}
+                  sx={button}
+                >
+                  Confirm
+                </Button>
+                <Button
+                  type="submit"
+                  value="Send"
+                  variant="contained"
+                  onClick={() => {
+                    setBookingFormOpen(false)
+                  }}
+                  sx={cancelButton}
+                >
+                  Cancel
+                </Button>
               </Box>
-              <Button
-                type="submit"
-                value="Send"
-                variant="contained"
-                onClick={() => {
-                  createBooking()
-                }}
-                sx={button}
-              >
-                Confirm
-              </Button>
-              <Button
-                type="submit"
-                value="Send"
-                variant="contained"
-                onClick={() => {
 
-                  setBookingFormOpen(false)
-                }}
-                sx={cancelButton}
-              >
-                Cancel
-              </Button>
             </Box>
 
-          </Box>
+          </form>
+
         </Box>
         : null
       }
+      <Box sx={errBox}>
+        {error ?
+          <Box>
+            <p>{error}</p>
+          </Box> : null}
+      </Box>
     </Box >
+
   )
 }
 
@@ -349,3 +446,54 @@ const cancelButton: SxProps = {
     backgroundColor: 'rgb(219, 23, 9)'
   },
 }
+// availableTables style
+const maineTablesBox: SxProps = {
+  position: 'absolute',
+  left: ' 50%',
+  top: '0',
+  transform: 'translateX(-50%)',
+  width: { xs: '100px', md: '600px', lg: '1200px' },
+  height: { xs: '100px', md: '600px', lg: '800px' },
+  backgroundColor: 'black',
+  color: 'white',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexDirection: 'column',
+  "&:hover": {
+    border: "1px solid red",
+  },
+}
+const AllTables: SxProps = {
+  // width: { xs: '100px', md: '600px', lg: '800px' },
+  height: { xs: '100px', md: '600px', lg: '600px' },
+  color: 'white',
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
+const tableBox: SxProps = {
+  flex: '1 0 20%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexDirection: 'column',
+}
+
+const errBox: SxProps = {
+  position: 'absolute',
+  transform: 'translateX(-50%)',
+  left: ' 50%',
+  bottom: '3em',
+  color: 'red',
+  fontSize: '1.2em',
+  fontweight: 'bold',
+  textTransform: 'uppercase',
+  width: { xs: '100px', md: '600px', lg: '700px' },
+  backgroundColor: 'rgb(55, 55, 50)',
+  textAlign: 'center',
+  userSelect: 'none',
+}
+
+
