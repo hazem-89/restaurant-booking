@@ -7,11 +7,13 @@
 
 ## To start the client side 
 ### `cd client`
+### `npm i`
 ### `npm start`
 
 
 ## To start the server side 
 ### `cd server`
+### `npm i`
 ### `npm start`
 
 ## To admin page
