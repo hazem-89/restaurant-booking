@@ -46,6 +46,7 @@ const mainBox: SxProps = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  maxWidth: "1600px"
 };
 
 const logoBox: SxProps = {

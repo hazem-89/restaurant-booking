@@ -6,10 +6,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import DatePicker from "react-datepicker";
 import { Button, SxProps, Typography } from '@mui/material';
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { ReservationsInterface, BookingInterface } from "../../Interfaces"
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -66,7 +66,7 @@ const ReservationForm = (_props: Props) => {
         const createBooking = async () => {
           const newBooking: ReservationsInterface = {
             NOG: numberOfPersons,
-            name: ReservationsDetails.name,
+            name: ReservationsDetails.name.toLowerCase(),
             phone: ReservationsDetails.phone,
             email: ReservationsDetails.email,
             date: chosenDate.toLocaleDateString(),
@@ -79,6 +79,8 @@ const ReservationForm = (_props: Props) => {
               console.log(response);
               nav("/confirmation")
               resetForm();
+              setAvailabilityOpen(false)
+              setBookingFormOpen(false)
 
             })
             .catch((error) => {
@@ -101,7 +103,7 @@ const ReservationForm = (_props: Props) => {
         .then((response) => {
           const data = response.data.availableTables
           console.log(data);
-          console.log();
+          console.log(date);
           console.log(typeof data);
           if (response.data.availableTables.length <= 0) {
             const errText = "unfortunately we are fully booked, please chose a different Date"
@@ -120,17 +122,10 @@ const ReservationForm = (_props: Props) => {
 
   /** Compare dates and st chosen date*/
   const handelDate = (newDate: Date) => {
-    const curDate = new Date(new Date().toString().substring(0, 15))
-    if (newDate > curDate) {
-      setChosenDate(newDate)
-      setError('')
-    } else {
-      const errText = "The date has passed, please give a new date"
-      setError(errText)
-      console.log(curDate);
-      console.log(newDate);
-    }
+    setChosenDate(newDate)
+    setError('')
   }
+
 
   /** Set chosen time */
   const handleTime = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,14 +176,16 @@ const ReservationForm = (_props: Props) => {
               <DatePicker
                 selected={chosenDate}
                 onChange={handelDate}
+                minDate={new Date()}
               />
             </Box>
           </Box>
           <Box>
             {/* check Available Tables button */}
-            {chosenDate && numberOfPersons && error === '' ? <Box>
+            <Box>
               <Button
                 variant="contained"
+                disabled={!numberOfPersons || error !== ''}
                 onClick={() => {
                   getAvailableTables()
                   setAvailabilityOpen(true)
@@ -198,8 +195,7 @@ const ReservationForm = (_props: Props) => {
               >
                 Confirm
               </Button>
-            </Box> : null
-            }
+            </Box>
           </Box>
 
         </Box>
@@ -268,6 +264,7 @@ const ReservationForm = (_props: Props) => {
               variant="contained"
               onClick={() => {
                 setAvailabilityOpen(false)
+                setAllAvailableTables([])
               }}
               sx={cancelButton}
             >
@@ -383,7 +380,8 @@ const mainBox: SxProps = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  position: 'relative'
+  position: 'relative',
+  maxWidth: "1600px"
 }
 const innerBox: SxProps = {
   display: 'flex',

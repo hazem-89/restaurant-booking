@@ -26,10 +26,11 @@ const MainPageHero = () => {
 }
 const maineBox: SxProps = {
   position: 'relative',
-  height: "700px"
+  height: "700px",
+  maxWidth: "1600px"
 };
 const mainText: SxProps = {
-  width: '900px',
+  width: { xs: '300px', md: '700px', lg: '900px' },
   height: '280px',
   backgroundColor: "rgba(55, 130, 135, 0.36)",
   color: '#f1f1f1',

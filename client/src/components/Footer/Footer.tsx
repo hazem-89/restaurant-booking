@@ -1,7 +1,6 @@
-import { Box, IconButton, Typography, Button } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import React from "react";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import GitHubIcon from "@mui/icons-material/GitHub";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { useNavigate } from "react-router-dom";
 
@@ -17,7 +16,6 @@ const mapstyling = {
 };
 
 function Footer() {
-  const navigate = useNavigate();
 
   return (
     <Box
@@ -25,6 +23,7 @@ function Footer() {
         backgroundColor: "#000E1A",
         display: "flex",
         justifyContent: "center",
+        maxWidth: "1600px"
       }}
     >
       <Box

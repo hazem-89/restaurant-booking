@@ -2,12 +2,34 @@ POST  http://localhost:4000/api/newBooking
 Content-Type: application/json
 
 {
-    "NOG": "996",
-    "phone": "7666666",
-    "tableId": "632634f4adb44440450d39ed",
-    "time": "21:00"
+    "NOG": 4,
+    "name": "zzzz",
+    "phone": "0706211404",
+    "email": "hazem.k.4488@gmail.com",
+    "date": "2022-09-22T22:00:00.000Z",
+    "time": "21:00",
+    "tableId": "632634ecadb44440450d39eb"
 }
 
 ###
 
 GET  http://localhost:4000/api/bookings
+###
+
+PUT  http://localhost:4000/api/632b4c0ffaa8c138986fcbe6
+Content-Type: application/json
+
+{
+    "NOG": "3",
+    "name": "hazem",
+    "phone": "0706211404",
+    "email": "hazem.k.4488@gmail.com",
+    "date": "2022-09-29T22:00:00.000Z",
+    "time": "18:00",
+    "tableId": "632634ecadb44440450d39eb"
+}
+
+
+###
+
+Delete  http://localhost:4000/api/632c16d0b9bdfa22cbaf4d9

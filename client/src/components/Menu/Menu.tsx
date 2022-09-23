@@ -65,6 +65,7 @@ const mainBox: SxProps = {
   flexDirection: 'column',
   width: { xs: '100%', md: '100%', lg: '100%', xl: '100%' },
   height: { xs: '700px', md: '1350px ', lg: '1500px', xl: '1500px' },
+  maxWidth: "1600px"
 }
 
 const innerBox: SxProps = {
