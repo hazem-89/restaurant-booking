@@ -2,7 +2,6 @@ import express, { Request, Response, Router } from 'express';
 import BookingModels from '../../models/BookingModels'
 import { BookingInterface } from '../../interface'
 import { Document, Types } from 'mongoose';
-import AdminModels from '../../models/AdminModels'
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const bookingRouter = Router();

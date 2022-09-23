@@ -1,17 +1,8 @@
-import { Avatar, Box, SxProps, Typography } from "@mui/material"
+import { Box, SxProps, Typography } from "@mui/material"
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-
 import menuImg1 from '../../assets/img/breakfast.jpg'
-import menuImg2 from '../../assets/img/breakfast.jpg'
-import menuImg3 from '../../assets/img/breakfast.jpg'
-import menuImg4 from '../../assets/img/breakfast.jpg'
-import menuImg5 from '../../assets/img/breakfast.jpg'
-import menuImg6 from '../../assets/img/breakfast.jpg'
-
-
-
 
 AOS.init();
 const Menu = () => {
@@ -130,31 +121,31 @@ const menu = [
   },
   {
     id: "2",
-    img: ` ${menuImg2}`,
+    img: ` ${menuImg1}`,
     title: "Something",
     dis: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem perspiciatis eligendi perferendis corrupti doloribus magni?",
   },
   {
     id: "3",
-    img: `${menuImg3}`,
+    img: `${menuImg1}`,
     title: "Something",
     dis: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem perspiciatis eligendi perferendis corrupti doloribus magni?",
   },
   {
     id: "4",
-    img: `${menuImg4}`,
+    img: `${menuImg1}`,
     title: "Something",
     dis: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem perspiciatis eligendi perferendis corrupti doloribus magni?"
   },
   {
     id: "5",
-    img: `${menuImg5}`,
+    img: `${menuImg1}`,
     title: "Something",
     dis: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem perspiciatis eligendi perferendis corrupti doloribus magni?"
   },
   {
     id: "6",
-    img: `${menuImg6}`,
+    img: `${menuImg1}`,
     title: "Something",
     dis: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem perspiciatis eligendi perferendis corrupti doloribus magni?"
   },

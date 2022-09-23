@@ -69,7 +69,7 @@ const ReservationForm = (_props: Props) => {
             name: ReservationsDetails.name.toLowerCase(),
             phone: ReservationsDetails.phone,
             email: ReservationsDetails.email,
-            date: chosenDate.toLocaleDateString(),
+            date: chosenDate.toISOString().substring(0, 10),
             time: chosenTime,
             tableId: tableId,
           };
@@ -94,7 +94,7 @@ const ReservationForm = (_props: Props) => {
 
   /** Get all available tables */
   const getAvailableTables = () => {
-    const date = chosenDate.toLocaleDateString();
+    const date = chosenDate.toISOString().substring(0, 10);
     try {
       axios
         .post(`http://localhost:4000/api/availability`, {
@@ -223,7 +223,7 @@ const ReservationForm = (_props: Props) => {
                       onChange={handleTime}
                     ></input>
                     <label>18:00</label>
-                  </Box> : <p>no 18</p>
+                  </Box> : <p>18:00 Not available</p>
                 }
                 {table.isAvailableAt21 ?
                   <Box
@@ -239,7 +239,7 @@ const ReservationForm = (_props: Props) => {
                     ></input>
                     <label>21:00</label>
                   </Box>
-                  : <p>no 21</p>}
+                  : <p>21:00 Not available</p>}
               </Box>
             ))}
           </Box>
@@ -331,11 +331,6 @@ const ReservationForm = (_props: Props) => {
                   type="submit"
                   value="Send"
                   variant="contained"
-                  // onClick={() => {
-                  //   setAvailabilityOpen(false)
-                  //   setBookingFormOpen(false)
-                  //   window.location.href = "/confirmation"
-                  // }}
                   sx={button}
                 >
                   Confirm

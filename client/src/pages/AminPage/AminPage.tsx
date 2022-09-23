@@ -1,14 +1,12 @@
 import { Box, Button, SxProps, TextField, Typography } from '@mui/material';
 import axios, { AxiosResponse } from 'axios';
 import React, { useEffect, useState } from 'react'
-// import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
 import DeleteIcon from '@mui/icons-material/Delete';
 const AminPage = () => {
   // const [chosenDate, setChosenDate] = useState(new Date());
-
   const [allBookings, setAllBookings] = useState([]);
   const [openAllBookings, setOpenAllBookings] = useState(false);
   const [searchedByName, setSearchedByName] = useState([{}]);
@@ -16,7 +14,6 @@ const AminPage = () => {
   const [name, setName] = useState('');
   const [selectedBooking, setSelectedBooking] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
-  // console.log('searchedByName1', searchedByName);
 
 
   /** Get All Bookings */
@@ -119,7 +116,7 @@ const AminPage = () => {
           </Box>
         </Box>
         <Box sx={resultsBox}>
-          {openAllBookings && allBookings.length > 0 ?
+          {allBookings.length > 0 ?
             <Box sx={allBookingsBox}>
               {allBookings.map((booking: any) => (
                 <Box sx={allBookingsInnerBox} key={booking._id}>
@@ -272,7 +269,8 @@ const allBookingsInnerBox: SxProps = {
   flexWrap: 'wrap',
   flexDirection: 'column',
   color: '#f1f1f1',
-  flex: '1 0 25%',
+  flex: '1 0 30%',
+  paddingLeft: '2em',
 
 }
 
