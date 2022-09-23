@@ -10,7 +10,7 @@ availabilityRouter.post('/availability', async (req: Request, res: Response, nex
   if (date) {
     const allBookings = await BookingModels.find({ date: req.body.date })
     const allBookings1 = allBookings.map((booking) => ({ tableId: booking.tableId, bookedTime: booking.time }))
-    console.log(allBookings1);
+    // console.log(allBookings);
 
     const allTables = await TableModels.find()
 
