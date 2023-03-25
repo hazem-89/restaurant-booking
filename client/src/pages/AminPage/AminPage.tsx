@@ -20,7 +20,7 @@ const AminPage = () => {
   useEffect(() => {
     async function fetchData() {
       const { data } = await axios.get(
-        `http://localhost:4000/api/bookings`
+        `/api/bookings`
       );
       setAllBookings(data);
 
